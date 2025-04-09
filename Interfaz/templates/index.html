@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container-center">
+        <div class="logos">
+            <img id= "iimas" src="{{ url_for('static', filename='images/iimas.png') }}" alt="IIMAS">
+            <img id= "inifap" src="{{ url_for('static', filename='images/inifap.jpg') }}" alt="INIFAP">
+        </div>
+
+        <!-- Login -->
+        <div>
+            <h2>Sistema Automático de Identificación y Conteo de Insectos de Interés Citrícola</h2>
+            <h2>(SAICIIC 1.0)</h2>
+            <h3>Iniciar Sesión</h3>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="Nombre de usuario" required>
+                <input type="password" id="password" placeholder="Contraseña" required>
+                <input type="submit" value="Ingresar">
+            </form>
+            <p class="error-message" id="errorMessage"></p>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/users.js') }}"></script>
+</body>
+</html>
