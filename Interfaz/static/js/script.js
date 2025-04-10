@@ -15,6 +15,9 @@ function switchToLiveCamera() {
     document.getElementById('btnFile').classList.remove('btn-azul');
 }
 
+// Variable para almacenar la URL anterior
+let currentVideoURL = null;
+
 // Manejar selección de archivo
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
@@ -23,11 +26,16 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     const liveVideo = document.getElementById('liveVideo');
     const localVideo = document.getElementById('localVideo');
     
-    // Crear URL temporal para el video seleccionado
-    const videoURL = URL.createObjectURL(file);
+    // Liberar la URL anterior si existe
+    if (currentVideoURL) {
+        URL.revokeObjectURL(currentVideoURL);
+    }
+    
+    // Crear nueva URL temporal para el video seleccionado
+    currentVideoURL = URL.createObjectURL(file);
     
     // Configurar el elemento de video
-    localVideo.src = videoURL;
+    localVideo.src = currentVideoURL;
     localVideo.style.display = 'block';
     liveVideo.style.display = 'none';
     
@@ -37,27 +45,13 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     
     // Reproducir automáticamente (opcional)
     localVideo.play().catch(e => console.log("Autoplay no permitido:", e));
+    
+    // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+    e.target.value = '';
 });
 
 // Inicializar
 switchToLiveCamera();
-
-// Modifica la función switchToLiveCamera para incluir resolución
-function switchToLiveCamera() {
-    const liveVideo = document.getElementById('liveVideo');
-    const localVideo = document.getElementById('localVideo');
-    
-    // Mostrar video en vivo y ocultar reproductor local
-    liveVideo.src = "/video_feed"; // Sin parámetros de resolución
-    liveVideo.style.display = 'block';
-    localVideo.style.display = 'none';
-    localVideo.pause();
-    
-    // Actualizar estilos de botones
-    document.getElementById('btnLive').classList.add('btn-azul');
-    document.getElementById('btnFile').classList.remove('btn-azul');
-}
-
 
 //---------------------------------------------------------------------------------
 // #####--- MQTT Y BOTONES ---#####
@@ -67,9 +61,6 @@ const topicBase = "LEAI4/trampa/actuadores/";   // Tópico base para sensores y 
 const topicDetecciones = "LEAI4/trampa/detecciones/"; //Tópico base para las detecciones
 const client = mqtt.connect(broker);
 
-// client.on("connect", () => {
-//     console.log("Conectado a MQTT");
-// });
 
 
 // --- Cambio de estado en botones ---
@@ -203,11 +194,6 @@ client.on("message", (topic, message) => {
     if (especie) {
         document.getElementById(`contador-${especie.id}`).textContent = message.toString();
     }
-    // // Manejar mensajes de detecciones
-    // else if (topic.startsWith(topicDetecciones)) {
-    //     const cantidad = message.toString();
-    //     actualizarListaAnimales(topic, cantidad);
-    // }
 });
 
 // --- Función para mostrar/ocultar los contenedores de telemetría ---
@@ -252,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
 // Inicializar interfaz
 function inicializarInterfaz() {
     const lista = document.getElementById('listaEspecies');
@@ -288,7 +275,6 @@ function actualizarContador(especieId, cambio) {
         console.log(`Publicado: ${especie.topic} = ${valor}`);
     }
 }
-
 
 // Inicializar al cargar
 window.onload = inicializarInterfaz;
